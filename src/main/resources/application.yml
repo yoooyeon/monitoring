@@ -1,0 +1,23 @@
+management:
+  info:
+    git:
+      mode: "full"
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+
+    web:
+      exposure:
+        include: "*"
+        exclude: "env, beans"
+
+
+logging:
+  level:
+    hello.controller: debug
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
+  port: 8080
