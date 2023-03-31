@@ -1,6 +1,37 @@
 ## Spring Actuator, Prometheus, Grafana
 
 ### Spring Actuator
+
+스프링 프레임워크의 라이브러리 중 하나로 스프링부트 애플리케이션을 모니터링하고 관리할 수 있다.
+
+1. build.gradle에 디펜던시 추가하기
+  ```groovy
+      implementation 'org.springframework.boot:spring-boot-starter-actuator' 
+  ```
+
+2. 외부 설정(application.yml)에 노출할 endpoint 등 설정하기
+```yml
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+
+    web:
+      exposure:
+        include: "*"
+        exclude: "env, beans"
+logging:
+  level:
+    hello.controller: debug
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
+```
+
+3. 결과 확인
+
 ```json
 {
   "_links": {
@@ -84,9 +115,47 @@
 }
 ```
 
-### Grafana
-![image](https://user-images.githubusercontent.com/89332391/229054925-e6c81c3f-85fc-4d3c-9b07-ea1f756cf7ca.png)
 
 
 ### Prometheus
+프로메테우스는 모니터링 관련 데이터의 데이터베이스 역할을 한다. 
+
+1. 다운로드 및 설치
+2. build.gradle에 다음 디펜던시 추가
+  ```groovy
+      implementation 'io.micrometer:micrometer-registry-prometheus' 
+  ```
+3. 애플리케이션을 실행한다.
+4. prometheus.yml 작성
+  ```yml
+ global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+  # - alertmanager:9093
+rule_files:
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: [ "localhost:9090" ]
+  
+  - job_name: "spring-actuator"
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 1s
+    static_configs:
+      - targets: [ 'localhost:8081' ]
+  ```
+5. 기본 포트는 9090으로 서버를 실행하고 http://localhost:9090/targets 로 들어가서 확인할 수 있다. 
 ![image](https://user-images.githubusercontent.com/89332391/229053295-1a093d40-6daf-4afd-b34d-e24fec1ca27d.png)
+
+### Grafana
+1. 다운로드 및 설치
+2. 애플리케이션, 프로메테우스 실행
+3. grafana-server.exe 실행
+4. 3000 포트로 들어가 데이터 소스 설정 및 대시보드 생성
+5. https://grafana.com/grafana/dashboards/ 다음 사이트에서 대시보드를 불러올 수 있음
+![image](https://user-images.githubusercontent.com/89332391/229054925-e6c81c3f-85fc-4d3c-9b07-ea1f756cf7ca.png)
+
