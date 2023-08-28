@@ -39,7 +39,7 @@ server:
       enabled: true
 ```
 
-3. 결과 확인
+3. 결과 확인 (http://localhost:8081/actuator)
 
 ```json
 {
